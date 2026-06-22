@@ -1,23 +1,56 @@
 #!/usr/bin/env bash
+set -e
+
 echo "Setting up Tmux and tmux-sessionizer..."
 
 # 1. Install Tmux Plugin Manager (TPM)
 if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
-    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 fi
 
-# 2. Clone his tmux-sessionizer tool
-if [ ! -d "$HOME/.local/src/tmux-sessionizer" ]; then
-    mkdir -p ~/.local/src
-    git clone https://github.com/ThePrimeagen/tmux-sessionizer.git ~/.local/src/tmux-sessionizer
-    # Symlink the script to a location in your PATH
-    mkdir -p ~/.local/bin
-    ln -sf ~/.local/src/tmux-sessionizer/tmux-sessionizer.sh ~/.local/bin/tmux-sessionizer
-    chmod +x ~/.local/bin/tmux-sessionizer
+# Create dirs only if they don't exist (or use -p which is also safe)
+for d in "$HOME/work" "$HOME/work/builds" "$HOME/projects" "$HOME/personal"; do
+    if [ ! -d "$d" ]; then
+        mkdir -p "$d"
+    fi
+done
+
+# 2. Create tmux-sessionizer script (ThePrimeagen's exact version)
+mkdir -p "$HOME/.local/bin"
+cat > "$HOME/.local/bin/tmux-sessionizer" << 'EOF'
+#!/usr/bin/env bash
+
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    selected=$(find ~/work/builds ~/projects ~/work ~/personal -mindepth 1 -maxdepth 1 -type d | fzf)
 fi
+
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+selected_name=$(basename "$selected" | tr . _)
+tmux_running=$(pgrep tmux)
+
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s $selected_name -c $selected
+    exit 0
+fi
+
+if ! tmux has-session -t=$selected_name 2> /dev/null; then
+    tmux new-session -ds $selected_name -c $selected
+fi
+
+tmux switch-client -t $selected_name
+EOF
+chmod +x "$HOME/.local/bin/tmux-sessionizer"
 
 # 3. Symlink the .tmux.conf
-ln -sf $(pwd)/configs/.tmux.conf ~/.tmux.conf
+ln -sf "$(pwd)/configs/.tmux.conf" "$HOME/.tmux.conf"
 
-# 4. Install tmux plugins (runs in background)
-~/.tmux/plugins/tpm/bin/install_plugins || true
+# 4. Install tmux plugins
+if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+    "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
+fi
+

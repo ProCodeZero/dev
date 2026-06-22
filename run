@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+echo "Starting Primeagen/Omarchy Hybrid Bootstrap..."
+echo "Pacman conf file is loading..."
+sudo cp configs/pacman.conf /etc/
+echo "Pacman conf file has been loaded successfully..."
+for script in runs/*.sh; do
+    echo "Executing $script..."
+    bash "$script"
+done
+echo "Bootstrap complete! Please restart your terminal or run 'source ~/.zshrc'."

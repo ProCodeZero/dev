@@ -1,0 +1,3 @@
+1. make a repo from it
+2. stick the nvim setup here as a subrepo
+...

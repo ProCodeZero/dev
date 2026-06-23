@@ -42,3 +42,6 @@ export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
 # Go binaries (sqlc, coll, air, goose, etc.)
 export PATH="$PATH:/home/hl/go/bin:/home/hl/.local/share/mise/installs/go/1.26.4/bin"
+
+# --- fzf universal keybindings and completion ---
+source <(fzf --zsh)

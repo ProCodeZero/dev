@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 echo "Installing Primeagen's core CLI tools..."
+set -e
 
 # Core terminal tools via Pacman
 sudo pacman -S --needed --noconfirm \
@@ -9,8 +10,6 @@ sudo pacman -S --needed --noconfirm \
     just \
     tmux \
     zsh \
-    zsh-autosuggestions \
-    zsh-syntax-highlighting \
     go \
     git \
     wget \

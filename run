@@ -1,8 +1,21 @@
 #!/usr/bin/env bash
 set -e
+
 echo "Starting Primeagen/Omarchy Hybrid Bootstrap..."
+echo "=============================================="
+
 for script in runs/*.sh; do
-    echo "Executing $script..."
-    bash "$script"
+  echo ""
+  echo "Executing $script..."
+  echo "----------------------------------------------"
+  if ! bash "$script"; then
+    echo "Error: $script failed!"
+    exit 1
+  fi
+  echo "$script completed successfully"
 done
-echo "Bootstrap complete! Please restart your terminal or run 'source ~/.zshrc'."
+
+echo ""
+echo "=============================================="
+echo "Bootstrap complete!"
+echo "Please restart your terminal or run: source ~/.zshrc"

@@ -10,4 +10,4 @@ mkdir -p "$TARGET_DIR"
 # Excluding the deprecated tiling.conf to prevent binding conflicts
 find ${PWD}/bindings -type f ! -name "tiling.conf" -exec cp {} "$TARGET_DIR/" \;
 
-echo "✅ Bindings copied successfully."
+echo "Bindings copied successfully."

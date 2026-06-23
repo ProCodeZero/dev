@@ -2,7 +2,7 @@
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
-ZSH_THEME="dst"
+ZSH_THEME="robbyrussell"
 
 # Plugins (removed invalid 'fzf' plugin)
 plugins=(
@@ -29,3 +29,6 @@ alias btop="btop"
 [ -f /usr/share/fzf/completion.zsh ]   && source /usr/share/fzf/completion.zsh
 # Fallback if you run fzf's install script instead:
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Go binaries (sqlc, coll, air, goose, etc.)
+export PATH="$PATH:/home/hl/go/bin:/home/hl/.local/share/mise/installs/go/1.26.4/bin"

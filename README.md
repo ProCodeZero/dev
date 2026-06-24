@@ -1,4 +1,4 @@
-# ThPrimeagen Dev Environment (Lite)
+# ThePrimeagen Dev Environment (Lite)
 
 Welcome to my personal development bootstrap.
 This is a ready-to-go, development environment that captures **80% of ThePrimeagen's legendary terminal workflow**, but makes it significantly easier to setup and more visually polished by leveraging **Omarchy** as the desktop foundation.

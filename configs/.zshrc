@@ -23,17 +23,20 @@ alias vim="nvim"
 alias v="nvim"
 alias conf="nvim ~/.config/nvim"
 
-# fzf install
-source <(fzf --zsh)
-
 # Set fzf default options for better UX
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
 # Go binaries (sqlc, coll, air, goose, etc.)
 export PATH="$PATH:/home/hl/go/bin:/home/hl/.local/share/mise/installs/go/1.26.4/bin"
 
+# 1. Unbind Ctrl+F from autosuggestions so it stops conflicting
+bindkey -r '^F'
+
+# 2. Bind Ctrl+L to accept autosuggestion (Right Arrow is already bound by default)
+bindkey '^K' autosuggest-accept
+
 # ThePrimeagen's tmux-sessionizer (Ctrl+f) — works outside tmux too
 bindkey -s '^f' '\n~/.local/bin/tmux-sessionizer\n'
 
-# --- fzf universal keybindings and completion ---
+# fzf install
 source <(fzf --zsh)

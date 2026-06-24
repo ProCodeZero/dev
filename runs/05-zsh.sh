@@ -33,7 +33,4 @@ if [ "$SHELL" != "$(which zsh)" ]; then
   chsh -s "$(which zsh)"
 fi
 
-# Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
-
 echo "Zsh setup complete."

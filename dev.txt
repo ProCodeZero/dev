@@ -394,6 +394,484 @@ run '~/.tmux/plugins/tpm/bin/tpm'
 export ZSH="$HOME/.oh-my-zsh"
 
 # Theme
+ZSH_THEME="robbyrussell"
+
+# Plugins
+plugins=(
+  git
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  z
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# --- Go environment ---
+export GOPATH=$HOME/go
+export PATH="$HOME/.local/bin:$GOPATH/bin:$PATH"
+
+# --- Aliases ---
+alias vim="nvim"
+alias v="nvim"
+alias conf="nvim ~/.config/nvim"
+
+# --- fzf integration (Arch Linux specific) ---
+# Try multiple possible locations for fzf files
+if [ -f /usr/share/fzf/keybindings.zsh ]; then
+  source /usr/share/fzf/keybindings.zsh
+  source /usr/share/fzf/completion.zsh
+elif [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+  source /usr/share/doc/fzf/examples/key-bindings.zsh
+  source /usr/share/doc/fzf/examples/completion.zsh
+elif command -v fzf-share >/dev/null 2>&1; then
+  # fzf-share is a helper that prints the share directory
+  source "$(fzf-share)/key-bindings.zsh"
+  source "$(fzf-share)/completion.zsh"
+fi
+
+# Set fzf default options for better UX
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+# Go binaries (sqlc, coll, air, goose, etc.)
+export PATH="$PATH:/home/hl/go/bin:/home/hl/.local/share/mise/installs/go/1.26.4/bin"
+
+# --- fzf universal keybindings and completion ---
+source <(fzf --zsh)
+
+```
+./configs/pacman.conf:
+```
+# See the pacman.conf(5) manpage for option and repository directives
+
+[options]
+Color
+ILoveCandy
+VerbosePkgLists
+HoldPkg = pacman glibc
+Architecture = auto
+CheckSpace
+ParallelDownloads = 5
+DownloadUser = alpm
+
+# By default, pacman accepts packages signed by keys that its local keyring
+# trusts (see pacman-key and its man page), as well as unsigned packages.
+SigLevel = Required DatabaseOptional
+LocalFileSigLevel = Optional
+
+# pacman searches repositories in the order defined here
+[core]
+Include = /etc/pacman.d/mirrorlist
+
+[extra]
+Include = /etc/pacman.d/mirrorlist
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+
+# TODO: See what can i do about it...
+#[omarchy]
+#SigLevel = Optional TrustAll
+#Server = https://pkgs.omarchy.org/stable/$arch
+
+```
+./dev.txt:
+```
+./bindings/clipboard.conf:
+```
+# Copy / Paste
+bindd = SUPER, C, Universal copy, sendshortcut, CTRL, Insert, activewindow
+bindd = SUPER, V, Universal paste, sendshortcut, SHIFT, Insert, activewindow
+bindd = SUPER, X, Universal cut, sendshortcut, CTRL, X, activewindow
+bindd = SUPER CTRL, V, Clipboard manager, exec, omarchy-launch-walker -m clipboard
+
+```
+./bindings/media.conf:
+```
+# Laptop multimedia keys for volume and LCD brightness (with OSD)
+bindeld = ,XF86AudioRaiseVolume, Volume up, exec, omarchy-swayosd-client --output-volume raise
+bindeld = ,XF86AudioLowerVolume, Volume down, exec, omarchy-swayosd-client --output-volume lower
+bindeld = ,XF86AudioMute, Mute, exec, omarchy-swayosd-client --output-volume mute-toggle
+bindeld = ,XF86AudioMicMute, Mute microphone, exec, omarchy-audio-input-mute
+bindeld = ,XF86MonBrightnessUp, Brightness up, exec, omarchy-brightness-display +5%
+bindeld = ,XF86MonBrightnessDown, Brightness down, exec, omarchy-brightness-display 5%-
+bindeld = SHIFT, XF86MonBrightnessUp, Brightness maximum, exec, omarchy-brightness-display 100%
+bindeld = SHIFT, XF86MonBrightnessDown, Brightness minimum, exec, omarchy-brightness-display 1%
+bindeld = ,XF86KbdBrightnessUp, Keyboard brightness up, exec, omarchy-brightness-keyboard up
+bindeld = ,XF86KbdBrightnessDown, Keyboard brightness down, exec, omarchy-brightness-keyboard down
+bindld = ,XF86KbdLightOnOff, Keyboard backlight cycle, exec, omarchy-brightness-keyboard cycle
+bindld = ,XF86TouchpadToggle, Toggle touchpad, exec, omarchy-toggle-touchpad
+bindld = ,XF86TouchpadOn, Enable touchpad, exec, omarchy-toggle-touchpad on
+bindld = ,XF86TouchpadOff, Disable touchpad, exec, omarchy-toggle-touchpad off
+
+# Precise 1% multimedia adjustments with Alt modifier
+bindeld = ALT, XF86AudioRaiseVolume, Volume up precise, exec, omarchy-swayosd-client --output-volume +1
+bindeld = ALT, XF86AudioLowerVolume, Volume down precise, exec, omarchy-swayosd-client --output-volume -1
+bindeld = ALT, XF86MonBrightnessUp, Brightness up precise, exec, omarchy-brightness-display +1%
+bindeld = ALT, XF86MonBrightnessDown, Brightness down precise, exec, omarchy-brightness-display 1%-
+
+# Requires playerctl
+bindld = , XF86AudioNext, Next track, exec, omarchy-swayosd-client --playerctl next
+bindld = , XF86AudioPause, Pause, exec, omarchy-swayosd-client --playerctl play-pause
+bindld = , XF86AudioPlay, Play, exec, omarchy-swayosd-client --playerctl play-pause
+bindld = , XF86AudioPrev, Previous track, exec, omarchy-swayosd-client --playerctl previous
+
+# Switch audio output with Super + Mute
+bindld = SUPER, XF86AudioMute, Switch audio output, exec, omarchy-audio-output-switch
+
+```
+./bindings/tiling-v2.conf:
+```
+# Close windows
+bindd = SUPER, W, Close window, killactive,
+bindd = CTRL ALT, DELETE, Close all windows, exec, omarchy-hyprland-window-close-all
+
+# Control tiling
+bindd = SUPER SHIFT, J, Toggle window split, layoutmsg, togglesplit
+bindd = SUPER, P, Pseudo window, pseudo, # dwindle
+bindd = SUPER, T, Toggle window floating/tiling, togglefloating,
+bindd = SUPER, F, Full screen, fullscreen, 0
+bindd = SUPER CTRL, F, Tiled full screen, fullscreenstate, 0 2
+bindd = SUPER ALT, F, Full width, fullscreen, 1
+bindd = SUPER, O, Pop window out (float & pin), exec, omarchy-hyprland-window-pop
+bindd = SUPER SHIFT, L, Toggle workspace layout, exec, omarchy-hyprland-workspace-layout-toggle
+
+# Move focus with SUPER + arrow keys
+# bindd = SUPER, LEFT, Focus on left window, movefocus, l
+# bindd = SUPER, RIGHT, Focus on right window, movefocus, r
+# bindd = SUPER, UP, Focus on above window, movefocus, u
+# bindd = SUPER, DOWN, Focus on below window, movefocus, d
+
+bindd = SUPER, H, Focus on left window, movefocus, l
+bindd = SUPER, L, Focus on right window, movefocus, r
+bindd = SUPER, K, Focus on above window, movefocus, u
+bindd = SUPER, J, Focus on below window, movefocus, d
+
+# Switch workspaces with SUPER + [1-9; 0]
+bindd = SUPER, code:10, Switch to workspace 1, workspace, 1
+bindd = SUPER, code:11, Switch to workspace 2, workspace, 2
+bindd = SUPER, code:12, Switch to workspace 3, workspace, 3
+bindd = SUPER, code:13, Switch to workspace 4, workspace, 4
+bindd = SUPER, code:14, Switch to workspace 5, workspace, 5
+bindd = SUPER, code:15, Switch to workspace 6, workspace, 6
+bindd = SUPER, code:16, Switch to workspace 7, workspace, 7
+bindd = SUPER, code:17, Switch to workspace 8, workspace, 8
+bindd = SUPER, code:18, Switch to workspace 9, workspace, 9
+bindd = SUPER, code:19, Switch to workspace 10, workspace, 10
+
+# Move active window to a workspace with SUPER + SHIFT + [1-9; 0]
+bindd = SUPER SHIFT, code:10, Move window to workspace 1, movetoworkspace, 1
+bindd = SUPER SHIFT, code:11, Move window to workspace 2, movetoworkspace, 2
+bindd = SUPER SHIFT, code:12, Move window to workspace 3, movetoworkspace, 3
+bindd = SUPER SHIFT, code:13, Move window to workspace 4, movetoworkspace, 4
+bindd = SUPER SHIFT, code:14, Move window to workspace 5, movetoworkspace, 5
+bindd = SUPER SHIFT, code:15, Move window to workspace 6, movetoworkspace, 6
+bindd = SUPER SHIFT, code:16, Move window to workspace 7, movetoworkspace, 7
+bindd = SUPER SHIFT, code:17, Move window to workspace 8, movetoworkspace, 8
+bindd = SUPER SHIFT, code:18, Move window to workspace 9, movetoworkspace, 9
+bindd = SUPER SHIFT, code:19, Move window to workspace 10, movetoworkspace, 10
+
+# Move active window silently to a workspace with SUPER + SHIFT + ALT + [1-9; 0]
+bindd = SUPER SHIFT ALT, code:10, Move window silently to workspace 1, movetoworkspacesilent, 1
+bindd = SUPER SHIFT ALT, code:11, Move window silently to workspace 2, movetoworkspacesilent, 2
+bindd = SUPER SHIFT ALT, code:12, Move window silently to workspace 3, movetoworkspacesilent, 3
+bindd = SUPER SHIFT ALT, code:13, Move window silently to workspace 4, movetoworkspacesilent, 4
+bindd = SUPER SHIFT ALT, code:14, Move window silently to workspace 5, movetoworkspacesilent, 5
+bindd = SUPER SHIFT ALT, code:15, Move window silently to workspace 6, movetoworkspacesilent, 6
+bindd = SUPER SHIFT ALT, code:16, Move window silently to workspace 7, movetoworkspacesilent, 7
+bindd = SUPER SHIFT ALT, code:17, Move window silently to workspace 8, movetoworkspacesilent, 8
+bindd = SUPER SHIFT ALT, code:18, Move window silently to workspace 9, movetoworkspacesilent, 9
+bindd = SUPER SHIFT ALT, code:19, Move window silently to workspace 10, movetoworkspacesilent, 10
+
+# Control scratchpad
+bindd = SUPER, S, Toggle scratchpad, togglespecialworkspace, scratchpad
+bindd = SUPER ALT, S, Move window to scratchpad, movetoworkspacesilent, special:scratchpad
+
+# TAB between workspaces
+bindd = SUPER, TAB, Next workspace, workspace, e+1
+bindd = SUPER SHIFT, TAB, Previous workspace, workspace, e-1
+bindd = SUPER CTRL, TAB, Former workspace, workspace, previous
+
+# Move workspaces to other monitors
+bindd = SUPER SHIFT ALT, LEFT, Move workspace to left monitor, movecurrentworkspacetomonitor, l
+bindd = SUPER SHIFT ALT, RIGHT, Move workspace to right monitor, movecurrentworkspacetomonitor, r
+bindd = SUPER SHIFT ALT, UP, Move workspace to up monitor, movecurrentworkspacetomonitor, u
+bindd = SUPER SHIFT ALT, DOWN, Move workspace to down monitor, movecurrentworkspacetomonitor, d
+
+# Swap active window with the one next to it with SUPER + SHIFT + arrow keys
+bindd = SUPER SHIFT, LEFT, Swap window to the left, swapwindow, l
+bindd = SUPER SHIFT, RIGHT, Swap window to the right, swapwindow, r
+bindd = SUPER SHIFT, UP, Swap window up, swapwindow, u
+bindd = SUPER SHIFT, DOWN, Swap window down, swapwindow, d
+
+# Cycle through applications on active workspace
+bindd = ALT, TAB, Focus on next window, cyclenext
+bindd = ALT SHIFT, TAB, Focus on previous window, cyclenext, prev
+bindd = ALT, TAB, Reveal active window on top, bringactivetotop
+bindd = ALT SHIFT, TAB, Reveal active window on top, bringactivetotop
+
+# Cycle through monitors
+bindd = CTRL ALT, TAB, Focus on next monitor, focusmonitor, +1
+bindd = CTRL ALT SHIFT, TAB, Focus on previous monitor, focusmonitor, -1
+
+# Resize active window
+bindd = SUPER, code:20, Expand window left, resizeactive, -100 0    # - key
+bindd = SUPER, code:21, Shrink window left, resizeactive, 100 0     # = key
+bindd = SUPER SHIFT, code:20, Shrink window up, resizeactive, 0 -100
+bindd = SUPER SHIFT, code:21, Expand window down, resizeactive, 0 100
+
+# Scroll through existing workspaces with SUPER + scroll
+bindd = SUPER, mouse_down, Scroll active workspace forward, workspace, e+1
+bindd = SUPER, mouse_up, Scroll active workspace backward, workspace, e-1
+
+# Move/resize windows with mainMod + LMB/RMB and dragging
+bindmd = SUPER, mouse:272, Move window, movewindow
+bindmd = SUPER, mouse:273, Resize window, resizewindow
+
+# Toggle groups
+bindd = SUPER, G, Toggle window grouping, togglegroup
+bindd = SUPER ALT, G, Move active window out of group, moveoutofgroup
+
+# Join groups
+bindd = SUPER ALT, LEFT, Move window to group on left, moveintogroup, l
+bindd = SUPER ALT, RIGHT, Move window to group on right, moveintogroup, r
+bindd = SUPER ALT, UP, Move window to group on top, moveintogroup, u
+bindd = SUPER ALT, DOWN, Move window to group on bottom, moveintogroup, d
+
+# Navigate a single set of grouped windows
+bindd = SUPER ALT, TAB, Next window in group, changegroupactive, f
+bindd = SUPER ALT SHIFT, TAB, Previous window in group, changegroupactive, b
+
+# Window navigation for grouped windows
+bindd = SUPER CTRL, LEFT, Move grouped window focus left, changegroupactive, b
+bindd = SUPER CTRL, RIGHT, Move grouped window focus right, changegroupactive, f
+
+# Scroll through a set of grouped windows with SUPER + ALT + scroll
+bindd = SUPER ALT, mouse_down, Next window in group, changegroupactive, f
+bindd = SUPER ALT, mouse_up, Previous window in group, changegroupactive, b
+
+# Activate window in a group by number
+bindd = SUPER ALT, code:10, Switch to group window 1, changegroupactive, 1
+bindd = SUPER ALT, code:11, Switch to group window 2, changegroupactive, 2
+bindd = SUPER ALT, code:12, Switch to group window 3, changegroupactive, 3
+bindd = SUPER ALT, code:13, Switch to group window 4, changegroupactive, 4
+bindd = SUPER ALT, code:14, Switch to group window 5, changegroupactive, 5
+
+# Cycle monitor scaling with SUPER + /
+bindd = SUPER, code:61, Cycle monitor scaling, exec, omarchy-hyprland-monitor-scaling-cycle
+bindd = SUPER ALT, code:61, Cycle monitor scaling backwards, exec, omarchy-hyprland-monitor-scaling-cycle --reverse
+
+```
+./bindings/tiling.conf:
+```
+# This is now a deprecated file meant for those who did not wish to learn the latest Omarchy hotkeys.
+# Do not make changes here, but bring them to tiling-v2.conf instead.
+
+# Close windows
+bindd = SUPER, W, Close window, killactive,
+bindd = CTRL ALT, DELETE, Close all windows, exec, omarchy-hyprland-window-close-all
+
+# Control tiling
+bindd = SUPER, J, Toggle window split, togglesplit, # dwindle
+bindd = SUPER, P, Pseudo window, pseudo, # dwindle
+bindd = SUPER SHIFT, V, Toggle window floating/tiling, togglefloating,
+bindd = SHIFT, F11, Force full screen, fullscreen, 0
+bindd = ALT, F11, Full width, fullscreen, 1
+
+# Move focus with SUPER + arrow keys
+bindd = SUPER, LEFT, Move focus left, movefocus, l
+bindd = SUPER, RIGHT, Move focus right, movefocus, r
+bindd = SUPER, UP, Move focus up, movefocus, u
+bindd = SUPER, DOWN, Move focus down, movefocus, d
+
+# Switch workspaces with SUPER + [0-9]
+bindd = SUPER, code:10, Switch to workspace 1, workspace, 1
+bindd = SUPER, code:11, Switch to workspace 2, workspace, 2
+bindd = SUPER, code:12, Switch to workspace 3, workspace, 3
+bindd = SUPER, code:13, Switch to workspace 4, workspace, 4
+bindd = SUPER, code:14, Switch to workspace 5, workspace, 5
+bindd = SUPER, code:15, Switch to workspace 6, workspace, 6
+bindd = SUPER, code:16, Switch to workspace 7, workspace, 7
+bindd = SUPER, code:17, Switch to workspace 8, workspace, 8
+bindd = SUPER, code:18, Switch to workspace 9, workspace, 9
+bindd = SUPER, code:19, Switch to workspace 10, workspace, 10
+
+# Move active window to a workspace with SUPER + SHIFT + [0-9]
+bindd = SUPER SHIFT, code:10, Move window to workspace 1, movetoworkspace, 1
+bindd = SUPER SHIFT, code:11, Move window to workspace 2, movetoworkspace, 2
+bindd = SUPER SHIFT, code:12, Move window to workspace 3, movetoworkspace, 3
+bindd = SUPER SHIFT, code:13, Move window to workspace 4, movetoworkspace, 4
+bindd = SUPER SHIFT, code:14, Move window to workspace 5, movetoworkspace, 5
+bindd = SUPER SHIFT, code:15, Move window to workspace 6, movetoworkspace, 6
+bindd = SUPER SHIFT, code:16, Move window to workspace 7, movetoworkspace, 7
+bindd = SUPER SHIFT, code:17, Move window to workspace 8, movetoworkspace, 8
+bindd = SUPER SHIFT, code:18, Move window to workspace 9, movetoworkspace, 9
+bindd = SUPER SHIFT, code:19, Move window to workspace 10, movetoworkspace, 10
+
+# TAB between workspaces
+bindd = SUPER, TAB, Next workspace, workspace, e+1
+bindd = SUPER SHIFT, TAB, Previous workspace, workspace, e-1
+bindd = SUPER CTRL, TAB, Former workspace, workspace, previous
+
+# Swap active window with the one next to it with SUPER + SHIFT + arrow keys
+bindd = SUPER SHIFT, LEFT, Swap window to the left, swapwindow, l
+bindd = SUPER SHIFT, RIGHT, Swap window to the right, swapwindow, r
+bindd = SUPER SHIFT, UP, Swap window up, swapwindow, u
+bindd = SUPER SHIFT, DOWN, Swap window down, swapwindow, d
+
+# Cycle through applications on active workspace
+bindd = ALT, TAB, Cycle to next window, cyclenext
+bindd = ALT SHIFT, TAB, Cycle to prev window, cyclenext, prev
+bindd = ALT, TAB, Reveal active window on top, bringactivetotop
+bindd = ALT SHIFT, TAB, Reveal active window on top, bringactivetotop
+
+# Resize active window
+bindd = SUPER, code:20, Expand window left, resizeactive, -100 0    # - key
+bindd = SUPER, code:21, Shrink window left, resizeactive, 100 0     # = key
+bindd = SUPER SHIFT, code:20, Shrink window up, resizeactive, 0 -100
+bindd = SUPER SHIFT, code:21, Expand window down, resizeactive, 0 100
+
+# Scroll through existing workspaces with SUPER + scroll
+bindd = SUPER, MOUSE_DOWN, Scroll active workspace forward, workspace, e+1
+bindd = SUPER, MOUSE_UP, Scroll active workspace backward, workspace, e-1
+
+# Move/resize windows with mainMod + LMB/RMB and dragging
+bindmd = SUPER, mouse:272, Move window, movewindow
+bindmd = SUPER, mouse:273, Resize window, resizewindow
+
+```
+./bindings/utilities.conf:
+```
+# Menus
+bindd = SUPER, SPACE, Launch apps, exec, omarchy-launch-walker
+bindd = SUPER CTRL, E, Emoji picker, exec, omarchy-launch-walker -m symbols
+bindd = SUPER CTRL, C, Capture menu, exec, omarchy-menu capture
+bindd = SUPER CTRL, O, Toggle menu, exec, omarchy-menu toggle
+bindd = SUPER CTRL, H, Hardware menu, exec, omarchy-menu hardware
+bindd = SUPER ALT, SPACE, Omarchy menu, exec, omarchy-menu
+bindd = SUPER SHIFT, code:201, Omarchy menu, exec, omarchy-menu
+bindd = SUPER, ESCAPE, System menu, exec, omarchy-menu system
+bindld = , XF86PowerOff, Power menu, exec, omarchy-menu system
+bindd = SUPER SHIFT, K, Show key bindings, exec, omarchy-menu-keybindings
+bindd = , XF86Calculator, Calculator, exec, gnome-calculator
+
+# Aesthetics
+bindd = SUPER SHIFT, SPACE, Toggle top bar, exec, omarchy-toggle-waybar
+bindd = SUPER CTRL, SPACE, Theme background menu, exec, omarchy-menu background
+bindd = SUPER SHIFT CTRL, SPACE, Theme menu, exec, omarchy-menu theme
+bindd = SUPER, BACKSPACE, Toggle window transparency, exec, omarchy-hyprland-window-transparency-toggle
+bindd = SUPER SHIFT, BACKSPACE, Toggle window gaps, exec, omarchy-hyprland-window-gaps-toggle
+bindd = SUPER CTRL, BACKSPACE, Toggle single-window square aspect, exec, omarchy-hyprland-window-single-square-aspect-toggle
+
+# Notifications
+bindd = SUPER, COMMA, Dismiss last notification, exec, makoctl dismiss
+bindd = SUPER SHIFT, COMMA, Dismiss all notifications, exec, makoctl dismiss --all
+bindd = SUPER CTRL, COMMA, Toggle silencing notifications, exec, omarchy-toggle-notification-silencing
+bindd = SUPER ALT, COMMA, Invoke last notification, exec, makoctl invoke
+bindd = SUPER SHIFT ALT, COMMA, Restore last notification, exec, makoctl restore
+
+# Toggles
+bindd = SUPER CTRL, I, Toggle locking on idle, exec, omarchy-toggle-idle
+bindd = SUPER CTRL, N, Toggle nightlight, exec, omarchy-toggle-nightlight
+bindd = SUPER CTRL, Delete, Toggle laptop display, exec, omarchy-hyprland-monitor-internal toggle
+bindd = SUPER CTRL ALT, Delete, Toggle laptop display mirroring, exec, omarchy-hyprland-monitor-internal-mirror toggle
+bindl = , switch:on:Lid Switch, exec, omarchy-hw-external-monitors && omarchy-hyprland-monitor-internal off
+bindl = , switch:off:Lid Switch, exec, omarchy-hyprland-monitor-internal on
+
+# Captures
+bindd = , PRINT, Screenshot, exec, omarchy-capture-screenshot
+bindd = ALT, PRINT, Screenrecording, exec, omarchy-menu screenrecord
+bindd = SUPER, PRINT, Color picker, exec, pkill hyprpicker || hyprpicker -a
+bindd = SUPER CTRL, PRINT, Extract text (OCR) from screenshot, exec, omarchy-capture-text-extraction
+
+# File sharing
+bindd = SUPER CTRL, S, Share, exec, omarchy-menu share
+
+# Transcoding
+bindd = SUPER CTRL, PERIOD, Transcode, exec, omarchy-transcode
+
+# Reminders
+bindd = SUPER CTRL, R, Set reminder, exec, omarchy-menu reminder-set
+bindd = SUPER CTRL ALT, R, Show reminders, exec, omarchy-reminder show
+bindd = SUPER SHIFT CTRL, R, Clear reminders, exec, omarchy-reminder clear
+
+# Waybar-less information
+bindd = SUPER CTRL ALT, T, Show time, exec, notify-send -u low "    $(date +"%A %H:%M  ·  %d %B %Y  ·  Week %V")"
+bindd = SUPER CTRL ALT, B, Show battery remaining, exec, notify-send -u low "$(omarchy-battery-status)"
+bindd = SUPER CTRL ALT, W, Show weather, exec, notify-send -u low "$(omarchy-weather-status)"
+
+# Control panels
+bindd = SUPER CTRL, A, Audio controls, exec, omarchy-launch-audio
+bindd = SUPER CTRL, B, Bluetooth controls, exec, omarchy-launch-bluetooth
+bindd = SUPER CTRL, W, Wifi controls, exec, omarchy-launch-wifi
+bindd = SUPER CTRL, T, Activity, exec, omarchy-launch-tui btop
+
+# Dictation
+bindd = SUPER CTRL, X, Toggle dictation, exec, voxtype record toggle
+
+bindd  = , F9, Start dictation (push-to-talk), exec, voxtype record start
+binddr = , F9, Stop dictation (push-to-talk),  exec, voxtype record stop
+
+# Zoom
+bindd = SUPER CTRL, Z, Zoom in, exec, hyprctl keyword cursor:zoom_factor $(hyprctl getoption cursor:zoom_factor -j | jq '.float + 1')
+bindd = SUPER CTRL ALT, Z, Reset zoom, exec, hyprctl keyword cursor:zoom_factor 1
+
+# Lock system
+bindd = SUPER CTRL, L, Lock system, exec, omarchy-system-lock
+
+```
+./configs/.tmux.conf:
+```
+# Set prefix to Ctrl-a (instead of Ctrl-b)
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# Enable mouse support (scrolling, resizing, clicking)
+set -g mouse on
+
+# Start window and pane numbering at 1
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Faster command sequences
+set -sg escape-time 0
+
+# Increase history limit
+set -g history-limit 50000
+
+# Vim keys for copy mode
+bind-key -T copy-mode-vi v send-keys -X begin-selection
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -selection clipboard"
+
+# Splitting panes (intuitive)
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+
+# Reload tmux config
+bind r source-file ~/.tmux.conf \; display-message "Config reloaded!"
+
+# Set the plugin manager path so the bootstrap script doesn't fail
+set-environment -g TMUX_PLUGIN_MANAGER_PATH "~/.tmux/plugins"
+
+# Plugins (Managed by TPM)
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-vim-focus' # Resizes panes when vim opens
+set -g @plugin 'christoomey/vim-tmux-navigator' # Seamless vim/tmux pane navigation
+
+# Initialize TMUX plugin manager (keep this line at the very bottom)
+run '~/.tmux/plugins/tpm/bin/tpm'
+
+```
+./configs/.zshrc:
+```
+# Path to your oh-my-zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Theme
 ZSH_THEME="dst"
 
 # Plugins (removed invalid 'fzf' plugin)
@@ -637,5 +1115,257 @@ NVIM_SRC="$(pwd)/nvim" # Adjust if your nvim config is elsewhere
 if [ -d "$NVIM_SRC" ]; then
     ln -sfn "$NVIM_SRC" ~/.config/nvim
 fi
+
+```
+
+```
+./pac_omarchy_dis.sh:
+```
+#!/usr/bin/env bash
+sudo cp ${PWD}/conf/pacman.conf /etc/
+
+```
+./run:
+```
+#!/usr/bin/env bash
+set -e
+
+echo "Starting Primeagen/Omarchy Hybrid Bootstrap..."
+echo "=============================================="
+
+for script in runs/*.sh; do
+  echo ""
+  echo "Executing $script..."
+  echo "----------------------------------------------"
+  if ! bash "$script"; then
+    echo "Error: $script failed!"
+    exit 1
+  fi
+  echo "$script completed successfully"
+done
+
+echo ""
+echo "=============================================="
+echo "Bootstrap complete!"
+echo "Please restart your terminal or run: source ~/.zshrc"
+
+```
+./runs/01-pacman.sh:
+```
+#!/usr/bin/env bash
+set -euo pipefail
+
+MIRRORLIST="/etc/pacman.d/mirrorlist"
+RACKSPACE_LINE="Server = https://mirror.rackspace.com/archlinux/\$repo/os/\$arch"
+PACMAN_SYNC_DIR="/var/lib/pacman/sync"
+
+# Replace mirrorlist with single Rackspace mirror
+echo "$RACKSPACE_LINE" | sudo tee "$MIRRORLIST" > /dev/null
+
+# Remove local package DB files
+sudo rm -f "${PACMAN_SYNC_DIR}"/*.db*
+
+# Force refresh package databases
+sudo pacman -Syy
+
+```
+./runs/02-omarchy.sh:
+```
+#!/usr/bin/env bash
+set -e
+echo "Copying Omarchy Hyprland bindings..."
+
+# Ensure the target directory exists
+TARGET_DIR="$HOME/.local/share/omarchy/default/hypr/bindings"
+mkdir -p "$TARGET_DIR"
+
+# Copy WITHOUT sudo so the files are owned by your user
+# Excluding the deprecated tiling.conf to prevent binding conflicts
+find ${PWD}/bindings -type f ! -name "tiling.conf" -exec cp {} "$TARGET_DIR/" \;
+
+echo "Bindings copied successfully."
+
+```
+./runs/03-cli-tools.sh:
+```
+#!/usr/bin/env bash
+echo "Installing Primeagen's core CLI tools..."
+set -e
+
+# Core terminal tools via Pacman
+sudo pacman -S --needed --noconfirm \
+    fzf \
+    ripgrep \
+    btop \
+    just \
+    tmux \
+    zsh \
+    go \
+    git \
+    wget \
+    curl
+
+# Install Go-based tools
+echo "Installing Go tools (air, coll, sqlc, goose)"
+go install github.com/air-verse/air@latest
+go install github.com/ProCodeZero/project-collector/cmd/coll@latest
+go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+go install github.com/pressly/goose/v3/cmd/goose@latest
+
+echo "Configuring Go PATH for future terminal sessions..."
+
+# Define the paths
+# 1. The default directory where `go install` puts binaries (like sqlc, coll, air)
+DEFAULT_GO_BIN="$HOME/go/bin"
+# 2. The specific mise path you manually fixed
+MISE_GO_BIN="$HOME/.local/share/mise/installs/go/1.26.4/bin"
+
+# Check if it's already in .zshrc to avoid adding it multiple times if you re-run the script
+if ! grep -q "go/bin" ~/.zshrc; then
+    echo "" >> ~/.zshrc
+    echo "# Go binaries (sqlc, coll, air, goose, etc.)" >> ~/.zshrc
+    echo "export PATH=\"\$PATH:${DEFAULT_GO_BIN}:${MISE_GO_BIN}\"" >> ~/.zshrc
+    echo "Added Go paths to ~/.zshrc"
+else
+    echo "ℹ️ Go paths already configured in ~/.zshrc"
+fi
+
+```
+./runs/04-tmux.sh:
+```
+#!/usr/bin/env bash
+set -e
+
+echo "Setting up Tmux and tmux-sessionizer..."
+
+# 1. Install Tmux Plugin Manager (TPM)
+if [ ! -d "$HOME/.tmux/plugins/tpm" ]; then
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+fi
+
+# Create dirs only if they don't exist (or use -p which is also safe)
+for d in "$HOME/work" "$HOME/work/builds" "$HOME/projects" "$HOME/personal"; do
+    if [ ! -d "$d" ]; then
+        mkdir -p "$d"
+    fi
+done
+
+# 2. Create tmux-sessionizer script (ThePrimeagen's exact version)
+mkdir -p "$HOME/.local/bin"
+cat > "$HOME/.local/bin/tmux-sessionizer" << 'EOF'
+#!/usr/bin/env bash
+
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    selected=$(find ~/work/builds ~/projects ~/work ~/personal -mindepth 1 -maxdepth 1 -type d | fzf)
+fi
+
+if [[ -z $selected ]]; then
+    exit 0
+fi
+
+selected_name=$(basename "$selected" | tr . _)
+tmux_running=$(pgrep tmux)
+
+if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
+    tmux new-session -s $selected_name -c $selected
+    exit 0
+fi
+
+if ! tmux has-session -t=$selected_name 2> /dev/null; then
+    tmux new-session -ds $selected_name -c $selected
+fi
+
+tmux switch-client -t $selected_name
+EOF
+chmod +x "$HOME/.local/bin/tmux-sessionizer"
+
+# 3. Symlink the .tmux.conf
+ln -sf "$(pwd)/configs/.tmux.conf" "$HOME/.tmux.conf"
+
+# 4. Install tmux plugins
+if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+    "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
+fi
+
+
+```
+./runs/05-zsh.sh:
+```
+#!/usr/bin/env bash
+set -e
+echo "Setting up Zsh and Oh-My-Zsh..."
+
+# 1. Install Oh-My-Zsh if not present
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  echo "Installing Oh-My-Zsh..."
+  # --unattended prevents it from launching a new zsh shell automatically
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+fi
+
+# 2. Define custom plugins directory
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+
+# 3. Clone zsh-autosuggestions if not already present
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+  echo "Installing zsh-autosuggestions plugin..."
+  git clone https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+fi
+
+# 4. Clone zsh-syntax-highlighting if not already present
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+  echo "Installing zsh-syntax-highlighting plugin..."
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+fi
+
+# 5. Symlink .zshrc
+ln -sf "$(pwd)/configs/.zshrc" ~/.zshrc
+
+# 6. Change default shell to zsh
+if [ "$SHELL" != "$(which zsh)" ]; then
+  echo "Changing default shell to zsh..."
+  chsh -s "$(which zsh)"
+fi
+
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
+
+echo "Zsh setup complete."
+
+```
+./runs/06-nvim.sh:
+```
+#!/usr/bin/env bash
+set -e
+echo "Setting up Neovim configuration..."
+
+NVIM_DIR="$HOME/.config/nvim"
+REPO_URL="https://github.com/ProCodeZero/kickstart.nvim.git"
+
+mkdir -p "$HOME/.config"
+
+# 1. Check if it already exists and is the correct git repository
+if [ -d "$NVIM_DIR/.git" ]; then
+    CURRENT_URL=$(git -C "$NVIM_DIR" remote get-url origin 2>/dev/null || echo "")
+    if [ "$CURRENT_URL" == "$REPO_URL" ]; then
+        echo "✅ Neovim configuration is already installed. Pulling latest changes..."
+        git -C "$NVIM_DIR" pull
+        exit 0
+    fi
+fi
+
+# 2. If it exists but is the wrong repo (or not a git repo), back it up
+if [ -e "$NVIM_DIR" ] || [ -L "$NVIM_DIR" ]; then
+    BACKUP_DIR="${NVIM_DIR}.bak.$(date +%Y%m%d%H%M%S)"
+    echo "Existing nvim config found (different repo or not a git repo). Backing up to $BACKUP_DIR..."
+    mv "$NVIM_DIR" "$BACKUP_DIR"
+fi
+
+# 3. Clone the kickstart.nvim repository
+echo "Cloning kickstart.nvim from ${REPO_URL}..."
+git clone "$REPO_URL" "$NVIM_DIR"
+
+echo "✅ Neovim configuration installed successfully!"
 
 ```
